@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 void main() {
   runApp(const MyApp());
@@ -56,17 +59,75 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+final TextEditingController _controller = TextEditingController();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again∫, and so nothing would appear to happen.
-      _counter++;
+// class NextPage extends StatelessElement {
+//   NextPage(super.widget);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Next Page'),
+//       ),
+//       body: Center(
+//         child: OutlinedButton(
+//           onPressed: () {  },
+//           child: ,
+//         ),
+//       ),
+//     );
+//   }
+// }
+class _MyHomePageState extends State<MyHomePage> {
+  // int _counter = 0;
+  String _type = ''; //ラジオボタンで使ってる
+  String name = '';
+  String gender = '';
+  String space = '';
+
+  // void _incrementCounter() { //数を増やす関数
+  //   setState(() {
+  //     // This call to setState tells the Flutter framework that something has
+  //     // changed in this State, which causes it to rerun the build method below
+  //     // so that the display can reflect the updated values. If we changed
+  //     // _counter without calling setState(), then the build method would not be
+  //     // called again∫, and so nothing would appear to happen.
+  //     _counter++;
+  //   });
+  // }
+
+  void showPicker() {
+    final list = [
+      '鹿児島',
+      '大阪',
+      '東京',
+      '北海道',
+    ];
+    final _pickerItems = list.map((item) => Text(item)).toList();
+    var selectedIndex = 0;
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 126,
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: CupertinoPicker(
+              itemExtent: 36,
+              children: _pickerItems,
+              onSelectedItemChanged: (int index) {
+                selectedIndex = index;
+              },
+            ),
+          ),
+        );
+      },
+    ).then((_) {
+      _controller.value = TextEditingValue(text: list[selectedIndex]);
+      space = list[selectedIndex];
     });
   }
 
@@ -106,37 +167,203 @@ class _MyHomePageState extends State<MyHomePage> {
           // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
           // action in the IDE, or press "p" in the console), to see the
           // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-              style: TextStyle(fontSize: 30), //自分で追加　文字サイズの変更
-              textAlign: TextAlign.center, //テキストを中央揃え
+            // const Text(
+            //   'You have pushed the button this many times:',
+            //   style: TextStyle(fontSize: 30), //自分で追加　文字サイズの変更
+            //   textAlign: TextAlign.center, //テキストを中央揃え
+            // ),
+            // Text( //ボタン押したら数が増えるやつ
+            //   '$_counter',
+            //   style: Theme.of(context).textTheme.headlineMedium,
+            // ),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '氏名',
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 3.0,
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const TextField(
+
+            TextField(
               //入力フォーム
               enabled: true,
               maxLength: 10,
               textAlign: TextAlign.center,
               obscureText: false,
               maxLines: 1,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: '入力してください',
-                labelText: '氏名',
+                // labelText: '氏名',
+              ),
+              onChanged: (value) {
+                name = value;
+              },
+            ),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '性別',
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 3.0,
+                ),
+                // textAlign: TextAlign.left,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Radio(
+                    value: '男',
+                    groupValue: _type,
+                    onChanged: (value) {
+                      setState(() {
+                        _type = value!;
+                      });
+                      gender = _type;
+                    }),
+                const Text('男'),
+                Radio(
+                  value: '女',
+                  groupValue: _type,
+                  onChanged: (value) {
+                    setState(() {
+                      _type = value!;
+                    });
+                    gender = _type;
+                  },
+                ),
+                const Text('女'),
+                Radio(
+                  value: 'その他',
+                  groupValue: _type,
+                  onChanged: (value) {
+                    setState(() {
+                      _type = value!;
+                    });
+                    gender = _type;
+                  },
+                ),
+                const Text('その他'),
+              ],
+            ),
+
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                '出身地',
+                style: TextStyle(
+                  fontSize: 18,
+                  height: 3.0,
+                ),
+              ),
+            ),
+
+            TextFormField(
+              onTap: () {
+                //キーボードが出ないようにする
+                FocusScope.of(context).requestFocus(new FocusNode());
+                showPicker();
+              },
+              controller: _controller,
+              textAlign: TextAlign.center,
+              enabled: true,
+              decoration: const InputDecoration(
+                hintText: '選択',
+                // labelText: '出身地',
+              ),
+              onChanged: (value) {
+                space = value;
+              },
+            ),
+            Container(
+              margin: const EdgeInsets.all(20),
+              child: OutlinedButton(
+                child: const Text('次へ'),
+                onPressed: () {
+                  //指定した画面に遷移する
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NextPage(
+                                nextPageName: name,
+                                nextPageSpace: space,
+                                nextPageGender: gender,
+                              ))); //Navigator
+                }, //onPressed
               ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton( //右下にある数を増やすためのボタン
+      //   onPressed: _incrementCounter,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class NextPage extends StatelessWidget {
+  const NextPage({super.key, required this.nextPageName, required this.nextPageSpace, required this.nextPageGender});
+  final String nextPageName;
+  final String nextPageSpace;
+  final String nextPageGender;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('確認画面')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('氏名：', style: TextStyle(fontSize: 16)),
+                      Text('性別：', style: TextStyle(fontSize: 16)),
+                      Text('出身地：', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(5),
+                  child: const Text(''),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(nextPageName, style: const TextStyle(fontSize: 16)),
+                      Text(nextPageGender, style: const TextStyle(fontSize: 16)),
+                      Text(nextPageSpace, style: const TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: OutlinedButton(
+                child: const Text('前の画面に戻る'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
